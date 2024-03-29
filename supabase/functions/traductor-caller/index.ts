@@ -1,20 +1,46 @@
-// Follow this setup guide to integrate the Deno language server with your editor:
-// https://deno.land/manual/getting_started/setup_your_environment
-// This enables autocomplete, go to definition, etc.
+import * as deepl from "npm:deepl-node";
+import { TargetLanguageCode } from "npm:deepl-node";
+import { SourceLanguageCode } from "npm:deepl-node";
 
-console.log("Hello from Functions!")
-
-Deno.serve(async (req) => {
-  const { name } = await req.json()
-  const data = {
-    message: `Hello ${name}!`,
+const translate = async (
+  text: string,
+  sourceLang: SourceLanguageCode,
+  targetLang: TargetLanguageCode
+) => {
+  const authKey = Deno.env.get("TRADUCTOR_API_KEY"); // Replace with your key
+  if (!authKey) {
+    throw new Error("TRADUCTOR_API_KEY is not set");
   }
 
-  return new Response(
-    JSON.stringify(data),
-    { headers: { "Content-Type": "application/json" } },
-  )
-})
+  const translator = new deepl.Translator(authKey);
+  const translation = await translator.translateText(
+    text,
+    sourceLang,
+    targetLang
+  );
+  return translation;
+};
+
+Deno.serve(async (req) => {
+  try {
+    const { text, sourceLang, targetLang } = await req.json();
+
+    const translation = await translate(
+      text,
+      sourceLang as SourceLanguageCode,
+      targetLang as TargetLanguageCode
+    );
+    return new Response(JSON.stringify({ translation }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), {
+      headers: { "Content-Type": "application/json" },
+      status: 500,
+    });
+  }
+});
 
 /* To invoke locally:
 
