@@ -1,3 +1,4 @@
+import { corsHeaders } from "../_shared/cors.ts";
 import * as deepl from "npm:deepl-node";
 import { TargetLanguageCode } from "npm:deepl-node";
 import { SourceLanguageCode } from "npm:deepl-node";
@@ -23,6 +24,10 @@ const translate = async (
 
 Deno.serve(async (req) => {
   try {
+    if (req.method === "OPTIONS") {
+      return new Response("ok", { headers: corsHeaders });
+    }
+
     const { text, sourceLang, targetLang } = await req.json();
 
     const translation = await translate(
@@ -32,11 +37,11 @@ Deno.serve(async (req) => {
     );
     return new Response(JSON.stringify({ translation }), {
       status: 200,
-      headers: { "Content-Type": "application/json" },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {
-      headers: { "Content-Type": "application/json" },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });
   }
