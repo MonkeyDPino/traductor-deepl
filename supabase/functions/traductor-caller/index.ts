@@ -24,6 +24,7 @@ const translate = async (
 
 Deno.serve(async (req) => {
   try {
+    console.time("request");
     if (req.method === "OPTIONS") {
       return new Response("ok", { headers: corsHeaders });
     }
@@ -35,6 +36,7 @@ Deno.serve(async (req) => {
       sourceLang as SourceLanguageCode,
       targetLang as TargetLanguageCode
     );
+    console.timeEnd("request");
     return new Response(JSON.stringify({ translation }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
