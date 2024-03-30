@@ -6,8 +6,9 @@ import { ArrowsIcon } from "./components/Icons";
 import LanguageSelector from "./components/LanguageSelector";
 import { SectionType } from "./types.d";
 import TextArea from "./components/TextArea";
-import { translate } from "./services/translate";
 import { useEffect } from "react";
+import { translate } from "./services/translate";
+import useDebounce from "./hooks/useDebounce";
 
 function App() {
   const {
@@ -23,12 +24,22 @@ function App() {
     setResult,
   } = useStore();
 
+  const debouncedFromText = useDebounce<string>(fromText, 1000);
+
   useEffect(() => {
-    const fetchTranslation = async () => {
-      setResult(await translate("hello world", null, "es"));
-    };
-    fetchTranslation();
-  }, []);
+    if (debouncedFromText !== "" && fromLanguage !== toLanguage) {
+      // translate(
+      //   debouncedFromText,
+      //   fromLanguage === "auto" ? null : fromLanguage,
+      //   toLanguage
+      // ).then((res) => {
+      //   if (res) {
+      //     setResult(res.translation.text);
+      //   }
+      // });
+      setResult("res.translation.text");
+    }
+  }, [debouncedFromText, fromLanguage, toLanguage]);
 
   return (
     <Container fluid>
@@ -67,13 +78,13 @@ function App() {
               onChange={setToLanguage}
               value={toLanguage}
             />
-
             <TextArea
               value={result}
               type={SectionType.TO}
               onChange={setResult}
               placeholder="Translation"
               loading={loading}
+              showCopyButton={true}
             />
           </Stack>
         </Col>

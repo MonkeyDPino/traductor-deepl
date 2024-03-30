@@ -1,5 +1,6 @@
-import { Form } from "react-bootstrap";
+import { Button, Form } from "react-bootstrap";
 import { SectionType } from "../types.d";
+import { ClipBoardIcon } from "./Icons";
 
 export type TextAreaProps = {
   type: SectionType.FROM | SectionType.TO;
@@ -7,6 +8,7 @@ export type TextAreaProps = {
   value: string;
   onChange: (text: string) => void;
   placeholder: string;
+  showCopyButton?: boolean;
 };
 
 const TextArea: React.FC<TextAreaProps> = ({
@@ -15,17 +17,31 @@ const TextArea: React.FC<TextAreaProps> = ({
   onChange,
   loading,
   placeholder,
+  showCopyButton,
 }) => {
   return (
-    <Form.Control
-      as="textarea"
-      placeholder={loading ? "Cargando..." : placeholder}
-      autoFocus={type === SectionType.FROM}
-      readOnly={type === SectionType.TO}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      style={{ height: "200px" }}
-    />
+    <div style={{ position: "relative" }}>
+      <Form.Control
+        as="textarea"
+        placeholder={loading ? "Cargando..." : placeholder}
+        autoFocus={type === SectionType.FROM}
+        readOnly={type === SectionType.TO}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        style={{ height: "200px" }}
+      />
+      {showCopyButton && (
+        <Button
+          variant="link"
+          style={{ position: "absolute", left: 0, bottom: 0 }}
+          onClick={() => {
+            navigator.clipboard.writeText(value);
+          }}
+        >
+          <ClipBoardIcon />
+        </Button>
+      )}
+    </div>
   );
 };
 

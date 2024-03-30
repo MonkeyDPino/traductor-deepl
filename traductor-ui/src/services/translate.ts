@@ -1,17 +1,26 @@
-import * as deepl from "deepl-node";
-
-const authKey = "e2014f0e-337d-4ce5-849d-bd077f115521:fx"; // Replace with your key
-const translator = new deepl.Translator(authKey);
+import { FromLanguages, Languages, translationResponse } from "../types";
 
 export const translate = async (
   text: string,
-  sourceLang: deepl.SourceLanguageCode | null,
-  targetLang: deepl.TargetLanguageCode
-) => {
-  const translation = await translator.translateText(
-    text,
-    sourceLang,
-    targetLang
-  );
-  return translation.text;
+  sourceLang: FromLanguages | null,
+  targetLang: Languages
+): Promise<translationResponse | false> => {
+  try {
+    const translation = await fetch(import.meta.env.VITE_TRANSLATE_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ text, sourceLang, targetLang }),
+    });
+    const json = await translation.json();
+    return {
+      translation: {
+        text: json?.translation?.text as string,
+      },
+    };
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 };

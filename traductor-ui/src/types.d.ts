@@ -24,4 +24,18 @@ enum SectionType {
   TO = "to",
 }
 
-export { State, FromLanguages, Languages, AutoLanguage, Action, SectionType };
+type translationResponse = {
+  translation: {
+    text: string;
+  };
+};
+
+export {
+  State,
+  FromLanguages,
+  Languages,
+  AutoLanguage,
+  Action,
+  SectionType,
+  translationResponse,
+};

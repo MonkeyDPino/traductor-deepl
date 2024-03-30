@@ -2,8 +2,8 @@ import { useReducer } from "react";
 import type { State, Action, FromLanguages, Languages } from "../types";
 
 const initialState: State = {
-  fromLanguage: "es",
-  toLanguage: "en",
+  fromLanguage: "ES",
+  toLanguage: "EN-US",
   fromText: "",
   result: "",
   loading: false,
@@ -11,13 +11,17 @@ const initialState: State = {
 
 const reducer = (state: State, action: Action): State => {
   const { type } = action;
+  const hasFromText = state.fromText !== "";
   switch (type) {
     case "INTERCHANGE_LANGUAGES":
       if (state.fromLanguage === "auto") {
         return state;
       }
+
       return {
         ...state,
+        loading: hasFromText,
+        result: "",
         fromLanguage: state.toLanguage,
         toLanguage: state.fromLanguage,
       };
@@ -25,19 +29,24 @@ const reducer = (state: State, action: Action): State => {
     case "SET_FROM_LANGUAGE":
       return {
         ...state,
+        loading: hasFromText && action.payload !== state.toLanguage,
+        result: action.payload === state.toLanguage ? state.result : "",
         fromLanguage: action.payload,
       };
 
     case "SET_TO_LANGUAGE":
       return {
         ...state,
+        loading: hasFromText && state.fromLanguage !== action.payload,
+        result: state.fromLanguage === action.payload ? state.result : "",
         toLanguage: action.payload,
       };
 
     case "SET_FROM_TEXT":
       return {
         ...state,
-        loading: true,
+        loading: action.payload !== "",
+        result: "",
         fromText: action.payload,
       };
 
@@ -54,8 +63,7 @@ const reducer = (state: State, action: Action): State => {
 };
 
 const useStore = () => {
-  const [{ fromLanguage, toLanguage, fromText, result, loading }, dispatch] =
-    useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   const setFromLanguage = (fromLanguage: FromLanguages) => {
     dispatch({ type: "SET_FROM_LANGUAGE", payload: fromLanguage });
@@ -78,11 +86,7 @@ const useStore = () => {
   };
 
   return {
-    fromLanguage,
-    toLanguage,
-    fromText,
-    result,
-    loading,
+    ...state,
     setFromLanguage,
     setToLanguage,
     setFromText,
