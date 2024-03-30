@@ -1,6 +1,6 @@
 import { Button, Form } from "react-bootstrap";
 import { SectionType } from "../types.d";
-import { ClipBoardIcon } from "./Icons";
+import { ClipBoardIcon, SpeakIcon } from "./Icons";
 
 export type TextAreaProps = {
   type: SectionType.FROM | SectionType.TO;
@@ -9,6 +9,8 @@ export type TextAreaProps = {
   onChange: (text: string) => void;
   placeholder: string;
   showCopyButton?: boolean;
+  showSpeakButton?: boolean;
+  onSpeak?: () => void;
 };
 
 const TextArea: React.FC<TextAreaProps> = ({
@@ -18,9 +20,17 @@ const TextArea: React.FC<TextAreaProps> = ({
   loading,
   placeholder,
   showCopyButton,
+  showSpeakButton,
+  onSpeak,
 }) => {
   return (
-    <div style={{ position: "relative" }}>
+    <div
+      style={{
+        border: "1px solid #ccc",
+        borderRadius: "5px",
+        padding: "5px",
+      }}
+    >
       <Form.Control
         as="textarea"
         placeholder={loading ? "Cargando..." : placeholder}
@@ -28,19 +38,30 @@ const TextArea: React.FC<TextAreaProps> = ({
         readOnly={type === SectionType.TO}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        style={{ height: "200px" }}
+        style={{
+          height: "180px",
+          border: "none",
+          resize: "none",
+        }}
       />
-      {showCopyButton && (
-        <Button
-          variant="link"
-          style={{ position: "absolute", left: 0, bottom: 0 }}
-          onClick={() => {
-            navigator.clipboard.writeText(value);
-          }}
-        >
-          <ClipBoardIcon />
-        </Button>
-      )}
+      <div style={{ textAlign: "start" }}>
+        {showCopyButton && (
+          <Button
+            variant="link"
+            onClick={() => {
+              navigator.clipboard.writeText(value);
+            }}
+            style={{ paddingRight: "5px" }}
+          >
+            <ClipBoardIcon />
+          </Button>
+        )}
+        {showSpeakButton && (
+          <Button variant="link" onClick={() => onSpeak && onSpeak()}>
+            <SpeakIcon />
+          </Button>
+        )}
+      </div>
     </div>
   );
 };

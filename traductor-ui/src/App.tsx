@@ -4,7 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import useStore from "./hooks/useStore";
 import { ArrowsIcon } from "./components/Icons";
 import LanguageSelector from "./components/LanguageSelector";
-import { SectionType } from "./types.d";
+import { FromLanguages, SectionType } from "./types.d";
 import TextArea from "./components/TextArea";
 import { useEffect } from "react";
 import { translate } from "./services/translate";
@@ -28,18 +28,24 @@ function App() {
 
   useEffect(() => {
     if (debouncedFromText !== "" && fromLanguage !== toLanguage) {
-      // translate(
-      //   debouncedFromText,
-      //   fromLanguage === "auto" ? null : fromLanguage,
-      //   toLanguage
-      // ).then((res) => {
-      //   if (res) {
-      //     setResult(res.translation.text);
-      //   }
-      // });
-      setResult("res.translation.text");
+      translate(
+        debouncedFromText,
+        fromLanguage === "auto" ? null : fromLanguage,
+        toLanguage
+      ).then((res) => {
+        if (res) {
+          setResult(res.translation.text);
+        }
+      });
+      // setResult("res.translation.text");
     }
   }, [debouncedFromText, fromLanguage, toLanguage]);
+
+  const handleSpeak = (text: string, lang: FromLanguages) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = lang;
+    speechSynthesis.speak(utterance);
+  };
 
   return (
     <Container fluid>
@@ -58,6 +64,8 @@ function App() {
               type={SectionType.FROM}
               onChange={setFromText}
               placeholder="Enter text"
+              showSpeakButton
+              onSpeak={() => handleSpeak(fromText, fromLanguage)}
             />
           </Stack>
         </Col>
@@ -84,7 +92,9 @@ function App() {
               onChange={setResult}
               placeholder="Translation"
               loading={loading}
-              showCopyButton={true}
+              showCopyButton
+              showSpeakButton
+              onSpeak={() => handleSpeak(result, toLanguage)}
             />
           </Stack>
         </Col>

@@ -3,7 +3,7 @@ import type { State, Action, FromLanguages, Languages } from "../types";
 
 const initialState: State = {
   fromLanguage: "ES",
-  toLanguage: "EN-US",
+  toLanguage: "en-US",
   fromText: "",
   result: "",
   loading: false,
@@ -21,7 +21,8 @@ const reducer = (state: State, action: Action): State => {
       return {
         ...state,
         loading: hasFromText,
-        result: "",
+        result: state.fromText,
+        fromText: state.result,
         fromLanguage: state.toLanguage,
         toLanguage: state.fromLanguage,
       };

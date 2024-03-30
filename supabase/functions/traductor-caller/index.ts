@@ -29,7 +29,9 @@ Deno.serve(async (req) => {
       return new Response("ok", { headers: corsHeaders });
     }
 
-    const { text, sourceLang, targetLang } = await req.json();
+    let { text, sourceLang, targetLang } = await req.json();
+
+    if (sourceLang === "en-US") sourceLang = "en";
 
     const translation = await translate(
       text,
