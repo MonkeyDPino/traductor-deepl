@@ -1,6 +1,7 @@
 import Form from "react-bootstrap/Form";
 import { LANGUAGES, AUTOLANGUAGE } from "../constants";
 import { FromLanguages, Languages, SectionType } from "../types.d";
+import { Select, Option } from "@mui/joy";
 
 type LanguageSelectorProps =
   | {
@@ -19,28 +20,35 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   onChange,
   value,
 }) => {
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    onChange(e.target.value as Languages);
+  const handleChange = (
+    e:
+      | React.MouseEvent<Element, MouseEvent>
+      | React.KeyboardEvent<Element>
+      | React.FocusEvent<Element, Element>
+      | null
+  ) => {
+    // onChange(e.target.value as Languages);
+    console.log(e);
   };
 
   return (
-    <Form.Select
+    <Select
       aria-label="Default select example"
       value={value}
-      onChange={handleChange}
+      onChange={(e) => handleChange(e)}
     >
       {type === SectionType.FROM &&
         Object.entries(AUTOLANGUAGE).map(([code, language]) => (
-          <option key={code} value={code}>
+          <Option key={code} value={code}>
             {language}
-          </option>
+          </Option>
         ))}
       {Object.entries(LANGUAGES).map(([code, language]) => (
-        <option key={code} value={code}>
+        <Option key={code} value={code}>
           {language}
-        </option>
+        </Option>
       ))}
-    </Form.Select>
+    </Select>
   );
 };
 
